@@ -7,6 +7,7 @@ package banco;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -23,7 +24,7 @@ public class Banco {
     public static void main(String[] args) {
         // TODO code application logic here
         
-        int opcao;
+        int opcao = -1;
         
         do{
             String menu = "0 - Sair\n";
@@ -31,88 +32,188 @@ public class Banco {
             menu += "2 - Mostrar todas as contas\n";
             menu += "3 - Excluir conta\n";
             menu += "4 - Sacar\n";
+            menu += "5 - Depositar\n";
+            menu += "6 - Transferir\n";
             menu += "\nEscolha uma opção:";
-            System.out.print(menu);
-            opcao = entrada.nextInt();
             
-            switch (opcao){
-                case 1:{
-                    adicionarConta();
-                    break;
-                }
-                case 2:{
-                    mostrarTodasContas();
-                    break;
-                }
-                case 3:{
-                    excluirConta();
-                    break;
-                }
-                case 4:{
-                    sacarDaConta();
-                    break;
-                }
-                default:{
-                    if (opcao != 0){
-                        System.out.println("Opção inválida");
+            try{
+                opcao = Integer.parseInt(JOptionPane.showInputDialog(menu));
+                switch (opcao){
+                    case 1:{
+                        adicionarConta();
+                        break;
                     }
-                    break;
-                }
+                    case 2:{
+                        mostrarTodasContas();
+                        break;
+                    }
+                    case 3:{
+                        excluirConta();
+                        break;
+                    }
+                    case 4:{
+                        sacarDaConta();
+                        break;
+                    }
+                    case 5:{
+                        depositarNaConta();
+                        break;
+                    }
+                    case 6:{
+                        transferenciaDeFundos();
+                        break;
+                    }
+                    default:{
+                        if (opcao != 0){
+                            JOptionPane.showMessageDialog(null, "Opção inválida");
+                        }
+                        break;
+                    }
+                }                                  
+            }catch(NumberFormatException ex){
+                JOptionPane.showMessageDialog(null, "Opção inválida");
             }
-        
         }while(opcao != 0);
         
     }
     
     private static void adicionarConta(){
-        Conta conta = new Conta();
-        System.out.print("Informe o número:");
-        conta.setNumero(entrada.nextInt());
-        entrada.nextLine();
-        System.out.print("Informe o nome:");
-        conta.setNomeTitular(entrada.nextLine());
-        System.out.print("Informe o saldo:");
-        conta.setSaldo(entrada.nextDouble());
+        
+        int opcao = -1;
+        
+        do{
+            String menu = "0 - Voltar\n";
+            menu += "1 - Conta Corrente\n";
+            menu += "2 - Conta Poupança\n";
+            menu += "\nEscolha uma opção:";
+            
+            try{
+                opcao = Integer.parseInt(JOptionPane.showInputDialog(menu));
+                switch (opcao){
+                    case 1:{
+                        ContaCorrente conta = new ContaCorrente();
+                        System.out.print("Informe o número:");
+                        conta.setNumero(entrada.nextInt());
+                        entrada.nextLine();
+                        System.out.print("Informe o nome:");
+                        conta.setNomeTitular(entrada.nextLine());
+                        System.out.print("Informe o saldo:");
+                        conta.setSaldo(entrada.nextDouble());
+                        System.out.print("Informe o limite:");
+                        conta.setLimite(entrada.nextDouble());
+                        banco.add(conta);
+                        opcao = 0;
+                        break;
+                    }
+                    case 2:{
+                        ContaPoupanca conta = new ContaPoupanca();
+                        System.out.print("Informe o número:");
+                        conta.setNumero(entrada.nextInt());
+                        entrada.nextLine();
+                        System.out.print("Informe o nome:");
+                        conta.setNomeTitular(entrada.nextLine());
+                        System.out.print("Informe o saldo:");
+                        conta.setSaldo(entrada.nextDouble());
+                        System.out.print("Informe a variação:");
+                        conta.setVariacao(entrada.nextInt());
+                        banco.add(conta);
+                        opcao = 0;
+                        break;
+                    }
+                    default:{
+                        if (opcao != 0){
+                            JOptionPane.showMessageDialog(null, "Opção inválida");
+                        }
+                        break;
+                    }
+                }
+            }catch(NumberFormatException ex){
+                JOptionPane.showMessageDialog(null, "Opção inválida");
+            }
+            
+            
+        }while(opcao != 0);
+
+        
+        
         //adicionando a conta criada na lista
-        banco.add(conta);
+        
     }
     
     private static void mostrarTodasContas(){
+        String msg = "";
         for (Conta conta : banco) {
-            System.out.println(conta.toString());
+            msg += conta.toString();
         }
+        JOptionPane.showMessageDialog(null, msg);
+    }
+    
+    private static int buscarIndiceConta(String complemento){
+        Conta conta = new ContaCorrente();
+        conta.setNumero(Integer.parseInt(JOptionPane.showInputDialog("Informe o número da conta "+complemento+":")));
+        return banco.indexOf(conta);
     }
     
     private static void excluirConta(){
-        System.out.print("Informe o número da conta que deseja excluir:");
-        Conta conta = new Conta();
-        conta.setNumero(entrada.nextInt());
+        int posicao = buscarIndiceConta("que deseja excluir");
         
-        int posicao = banco.indexOf(conta);
         if (posicao >= 0){
-            banco.remove(posicao);
-            System.out.println("Conta excluída com sucesso");
+            if (JOptionPane.showConfirmDialog(null, 
+                    "Deseja realmente excluir essa conta?") == JOptionPane.YES_OPTION){
+                banco.remove(posicao);
+                JOptionPane.showMessageDialog(null, "Conta excluída com sucesso");
+            }
         }else{
-            System.out.println("Conta não encontrada");
+            JOptionPane.showMessageDialog(null, "Conta não encontrada");
         } 
     }
     
     private static void sacarDaConta(){
-        System.out.print("Informe o número da conta que deseja sacar:");
-        Conta contaSaque = new Conta();
-        contaSaque.setNumero(entrada.nextInt());
-        int posicao = banco.indexOf(contaSaque);
+        int posicao = buscarIndiceConta("que deseja sacar");
         
         if (posicao >= 0) {
-            System.out.print("Informe o valor que deseja sacar:");
-            double valor = entrada.nextDouble();
+            
+            double valor = Double.parseDouble(JOptionPane.showInputDialog("Informe o valor que deseja sacar:"));
+            
             if (banco.get(posicao).sacar(valor)){
-                System.out.println("Saque realizado com sucesso!");
+                JOptionPane.showMessageDialog(null, "Saque realizado com sucesso!");
             }else{
-                System.out.println("Saldo insuficiente!");
+                JOptionPane.showMessageDialog(null, "Saldo insuficiente!");
             }
         }else{
+            JOptionPane.showMessageDialog(null, "Conta não encontrada!");
+        }
+    }
+    
+    private static void depositarNaConta(){
+        int posicao = buscarIndiceConta("que deseja depositar");
+        
+        if (posicao >= 0) {
+            System.out.print("Informe o valor que deseja depositar:");
+            double valor = entrada.nextDouble();
+            banco.get(posicao).depositar(valor);
+        }else{
             System.out.println("Conta não encontrada!");
+        }
+    }
+    
+    private static void transferenciaDeFundos(){
+        int posOrigem = buscarIndiceConta("de origem");
+        if (posOrigem >= 0) {
+            int posDestino = buscarIndiceConta("de destino");
+            if (posDestino >= 0) {
+                System.out.print("Informe o valor que deseja transferir:");
+                double valor = entrada.nextDouble();
+                if (banco.get(posOrigem).transferir(banco.get(posDestino), valor)){
+                    System.out.println("Transferência realizada com sucesso");
+                }else{
+                    System.out.println("A Transferência não pôde ser realizada");
+                }
+            }else{
+                System.out.println("Conta de destino não encontrada!");
+            }
+        }else{
+            System.out.println("Conta de origem não encontrada!");
         }
     }
 }

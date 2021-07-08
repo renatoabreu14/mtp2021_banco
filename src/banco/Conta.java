@@ -9,32 +9,25 @@ package banco;
  *
  * @author renato
  */
-public class Conta {
+public abstract class Conta {
     
     private int numero;
     private String nomeTitular;
     private double saldo;
-    
-    public void depositar(double valor){
-        this.setSaldo(this.getSaldo() + valor);
+
+    public Conta() {
+        
+    }
+
+    public Conta(int numero, String nomeTitular, double saldo) {
+        this.numero = numero;
+        this.nomeTitular = nomeTitular;
+        this.saldo = saldo;
     }
     
-    public boolean sacar(double valor){
-        if ((this.getSaldo() - valor) >= 0){
-            this.setSaldo(this.getSaldo() - valor);
-            return true;
-        }
-        return false;
-    }
-    
-    public boolean transferir(Conta destino, double valor){
-        if (this.sacar(valor)){
-            destino.depositar(valor);
-            return true;
-        }
-        return false;
-    }
-    
+    public abstract void depositar(double valor);
+    public abstract boolean sacar(double valor);
+    public abstract boolean transferir(Conta destino, double valor);
 
     public int getNumero() {
         return numero;
@@ -77,10 +70,29 @@ public class Conta {
         String msg = "";
         msg += "Número da conta: " + this.getNumero() + "\n";
         msg += "Nome do títular: " + this.getNomeTitular()+ "\n";
-        msg += "Saldo da conta: " + this.getSaldo()+ "\n\n";
+        msg += "Saldo da conta: " + this.getSaldo()+ "\n";
         return msg; //To change body of generated methods, choose Tools | Templates.
     }
     
-    
-    
 }
+
+
+   /*public boolean sacar(double valor){
+        if ((this.getSaldo() - valor) >= 0){
+            this.setSaldo(this.getSaldo() - valor);
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean transferir(Conta destino, double valor){
+        if (this.sacar(valor)){
+            destino.depositar(valor);
+            return true;
+        }
+        return false;
+    }*/
+
+/*public void depositar(double valor){
+        this.setSaldo(this.getSaldo() + valor);
+    }*/
